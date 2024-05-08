@@ -1,43 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import DataJson from "../../data.json";
-
-interface dataType {
-  type: string;
-  name: string;
-}
+import { dataType } from "./interface";
 
 export default function Problem1() {
   const [Data, setData] = useState<dataType[]>(DataJson);
   const [Fruit, setFruit] = useState<dataType[]>([]);
   const [Vegetable, setVegetable] = useState<dataType[]>([]);
 
-  const [prevFruitData, setprevFruit] = useState<dataType[]>([]);
-  const [prevVegetableData, setprevVegetable] = useState<dataType[]>([]);
-
   useEffect(() => {
-    // let cloneData = [...DataJson];
-    // setData(cloneData);
-
-    const intervalId = setInterval(() => {
-      // Shifting elements from Fruit and updating state
-      setFruit((prevFruit) => {
-        const updatedFruit = [...prevFruit];
-        updatedFruit.shift();
-        return updatedFruit;
-      });
-
-      // Shifting elements from Vegetable and updating state
-      setVegetable((prevVegetable) => {
-        const updatedVegetable = [...prevVegetable];
-        updatedVegetable.shift();
-        return updatedVegetable;
-      });
-    }, 5000);
-
-    // Clear the interval on component unmount to avoid memory leaks
-    return () => clearInterval(intervalId);
-  }, []);
+    let uniqDepartment = Data.filter(
+      (item, pos, self) => self.findIndex((v) => v.name === item.name) === pos
+    );
+    setData(uniqDepartment);
+  }, [Fruit, Vegetable]);
 
   const ClickAction = (name: string, type: string, idx: number) => {
     let value = { type: type, name: name };
@@ -47,15 +23,34 @@ export default function Problem1() {
       setFruit(newFruit);
       Data.splice(idx, 1);
       setData(Data);
+
+      setTimeout(() => {
+        setFruit((prevFruit) => {
+          const updatedFruit = [...prevFruit];
+          updatedFruit.shift();
+          return updatedFruit;
+        });
+        setData((prevData) => [...prevData, value]);
+      }, 5000);
     } else {
       let newFruit = [...Vegetable, value];
       setVegetable(newFruit);
       Data.splice(idx, 1);
       setData(Data);
+
+      setTimeout(() => {
+        setVegetable((prevVegetable) => {
+          const updatedVegetable = [...prevVegetable];
+          updatedVegetable.shift();
+          return updatedVegetable;
+        });
+        setData((prevData) => [...prevData, value]);
+      }, 5000);
     }
   };
 
-  const ClickAction2 = (name: string, type: string, idx: number) => {
+  //
+  const deleteAction = (name: string, type: string, idx: number) => {
     let value = { type: type, name: name };
     let newData = [...Data, value];
     setData(newData);
@@ -70,14 +65,14 @@ export default function Problem1() {
   };
 
   return (
-    <main className="bg-white flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="bg-white flex min-h-screen flex-col items-center justify-between p-12">
       <div className="grid grid-cols-3 gap-4">
-        <div className="w-[30rem] h-[45rem]">
+        <div className="w-[20rem] h-[35rem]">
           {Data.map((item, idx) => {
             return (
               <div className="flex justify-center py-3" key={idx}>
                 <button
-                  className="text-black hover:bg-gray-200 border-2 rounded-md border-gray-200 hover:border-gray-200 w-[30rem] h-[2rem]"
+                  className="text-black hover:bg-gray-200 border-2 rounded-md border-gray-200 hover:border-gray-200 w-[20rem] h-[2rem]"
                   onClick={() => ClickAction(item.name, item.type, idx)}
                 >
                   {item.name}
@@ -87,17 +82,17 @@ export default function Problem1() {
           })}
         </div>
 
-        <div className="border-2 border-gray-200 w-[30rem] h-[45rem]">
+        <div className="border-2 border-gray-200 w-[20rem] h-[35rem]">
           <h1 className="text-black text-center font-semibold bg-gray-200 py-1">
             Fruit
           </h1>
-          <div className="w-[30rem] h-[45rem] px-6">
+          <div className="w-[20rem] h-[25rem] px-6">
             {Fruit.map((item, idx) => {
               return (
                 <div className="flex justify-center py-3" key={idx}>
                   <button
-                    className="text-black hover:bg-gray-200 border-2 rounded-md border-gray-200 hover:border-gray-200 w-[30rem] h-[2rem]"
-                    onClick={() => ClickAction2(item.name, item.type, idx)}
+                    className="text-black hover:bg-gray-200 border-2 rounded-md border-gray-200 hover:border-gray-200 w-[20rem] h-[2rem]"
+                    onClick={() => deleteAction(item.name, item.type, idx)}
                   >
                     {item.name}
                   </button>
@@ -107,17 +102,17 @@ export default function Problem1() {
           </div>
         </div>
 
-        <div className="border-2 border-gray-200 w-[30rem] h-[45rem]">
+        <div className="border-2 border-gray-200 w-[20rem] h-[35rem]">
           <h1 className="text-black text-center font-semibold bg-gray-200 py-1">
             Vegetable
           </h1>
-          <div className="w-[30rem] h-[45rem] px-6">
+          <div className="w-[20rem] h-[25rem] px-6">
             {Vegetable.map((item, idx) => {
               return (
                 <div className="flex justify-center py-3" key={idx}>
                   <button
                     className="text-black hover:bg-gray-200 border-2 rounded-md border-gray-200 hover:border-gray-200 w-[30rem] h-[2rem]"
-                    onClick={() => ClickAction2(item.name, item.type, idx)}
+                    onClick={() => deleteAction(item.name, item.type, idx)}
                   >
                     {item.name}
                   </button>
